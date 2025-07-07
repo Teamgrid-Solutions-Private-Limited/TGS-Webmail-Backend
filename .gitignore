@@ -1,0 +1,35 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Log files
+logs
+*.log
+npm-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Uploaded files (if not to be tracked in Git)
+uploads/
+
+# Optional: VSCode settings
+.vscode/
+
+# Build artifacts
+dist/
+build/
+
+# Coverage reports
+coverage/
+
+# Postman files (optional if private)
+*.postman_environment.json
+*.postman_collection.json
+
+# Other
+*.tgz
+.cache/
