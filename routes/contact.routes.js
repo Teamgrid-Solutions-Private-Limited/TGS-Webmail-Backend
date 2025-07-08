@@ -3,6 +3,7 @@ const router = express.Router();
 const upload = require('../middlewares/fileUpload.middleware');
 const { body } = require('express-validator');
 const { submitContactForm } = require('../controllers/contact.controller');
+const {exportContacts } = require('../controllers/contactExport.controller');
 
 router.post(
   '/',
@@ -14,5 +15,8 @@ router.post(
   ],
   submitContactForm
 );
+router.get('/export', exportContacts);
+
+
 
 module.exports = router;
