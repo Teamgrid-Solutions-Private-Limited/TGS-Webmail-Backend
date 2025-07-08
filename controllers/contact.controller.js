@@ -2,6 +2,15 @@ const ContactQuery = require('../models/contact.model');
 const { validationResult } = require('express-validator');
 const sendEmail = require('../utils/emailSender');
 
+const isValidUrl = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
 exports.submitContactForm = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -14,14 +23,16 @@ exports.submitContactForm = async (req, res) => {
       company,
       topics,
       message,
-      attachmentLinks // <-- Accept Google Drive or other URLs
+      attachmentLinks // May be single or multiple
     } = req.body;
 
-    // Combine file uploads and external links
+    // Process uploaded files
     const uploadedFiles = req.files?.map(file => file.path) || [];
+
+    // Process shared links
     const driveLinks = Array.isArray(attachmentLinks)
-      ? attachmentLinks
-      : attachmentLinks
+      ? attachmentLinks.filter(link => isValidUrl(link))
+      : attachmentLinks && isValidUrl(attachmentLinks)
         ? [attachmentLinks]
         : [];
 
@@ -40,7 +51,7 @@ exports.submitContactForm = async (req, res) => {
 
     await contactEntry.save();
 
-    // Email message
+    // ✉️ Send Email
     const emailSubject = `📨 New Contact Form Submission from ${fullName}`;
     const emailHtml = `
       <h2>New Contact Query</h2>
