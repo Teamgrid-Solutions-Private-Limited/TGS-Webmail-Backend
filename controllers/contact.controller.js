@@ -1,6 +1,6 @@
 const ContactQuery = require('../models/contact.model');
 const { validationResult } = require('express-validator');
-const sendEmail = require('../utils/emailSender'); // <-- ADD THIS
+const sendEmail = require('../utils/emailSender');
 
 exports.submitContactForm = async (req, res) => {
   try {
@@ -13,11 +13,21 @@ exports.submitContactForm = async (req, res) => {
       phoneNumber,
       company,
       topics,
-      message
+      message,
+      attachmentLinks // <-- Accept Google Drive or other URLs
     } = req.body;
 
-    const attachments = req.files?.map(file => file.path) || [];
+    // Combine file uploads and external links
+    const uploadedFiles = req.files?.map(file => file.path) || [];
+    const driveLinks = Array.isArray(attachmentLinks)
+      ? attachmentLinks
+      : attachmentLinks
+        ? [attachmentLinks]
+        : [];
 
+    const attachments = [...uploadedFiles, ...driveLinks];
+
+    // Save to DB
     const contactEntry = new ContactQuery({
       fullName,
       workEmail,
@@ -30,7 +40,7 @@ exports.submitContactForm = async (req, res) => {
 
     await contactEntry.save();
 
-    // ✉️ Send Email to Admin
+    // Email message
     const emailSubject = `📨 New Contact Form Submission from ${fullName}`;
     const emailHtml = `
       <h2>New Contact Query</h2>
@@ -40,6 +50,12 @@ exports.submitContactForm = async (req, res) => {
       <p><strong>Company:</strong> ${company || 'N/A'}</p>
       <p><strong>Topics:</strong> ${(Array.isArray(topics) ? topics : [topics]).join(', ')}</p>
       <p><strong>Message:</strong><br>${message}</p>
+      ${attachments.length > 0 ? `
+        <p><strong>Attachments:</strong></p>
+        <ul>
+          ${attachments.map(link => `<li><a href="${link}" target="_blank">${link}</a></li>`).join('')}
+        </ul>
+      ` : ''}
     `;
 
     await sendEmail({ subject: emailSubject, html: emailHtml });
@@ -54,4 +70,3 @@ exports.submitContactForm = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
-// Note: Ensure that the sendEmail utility is properly configured to send emails using your email service provider.

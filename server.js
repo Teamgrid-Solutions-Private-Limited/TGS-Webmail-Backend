@@ -9,6 +9,7 @@ const hpp = require('hpp');
 const morgan = require('morgan');
 const compression = require('compression');
 const contactRoutes = require('./routes/contact.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 // Load environment variables
 dotenv.config();
@@ -37,6 +38,10 @@ app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/api/contact', contactRoutes);
+app.use('/api/admin', adminRoutes);
+app.get('/', (req, res) => {
+  res.send('Welcome to the TeamGrid API');
+});
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
