@@ -17,6 +17,7 @@ router.post(
 );
 router.get('/export', exportContacts);
 
-
+// Instant upload endpoint
+router.post('/upload', upload.single('file'), require('../controllers/contact.controller').instantUpload);
 
 module.exports = router;

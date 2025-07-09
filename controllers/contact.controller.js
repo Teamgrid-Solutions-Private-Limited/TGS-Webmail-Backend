@@ -81,3 +81,12 @@ exports.submitContactForm = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
+
+// Instant file upload handler
+exports.instantUpload = (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  // Return file path or name as reference
+  res.json({ filePath: req.file.path, fileName: req.file.filename });
+};
