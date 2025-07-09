@@ -12,10 +12,11 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|pdf|doc|docx/;
+  // Allow images, documents, and video files
+  const allowedTypes = /jpeg|jpg|png|pdf|doc|docx|mp4|avi|mov/;
   const ext = allowedTypes.test(path.extname(file.originalname).toLowerCase());
   if (ext) cb(null, true);
-  else cb(new Error('Only images and documents are allowed!'), false);
+  else cb(new Error('Only images, documents, and videos are allowed!'), false);
 };
 
 const upload = multer({ storage, fileFilter });
