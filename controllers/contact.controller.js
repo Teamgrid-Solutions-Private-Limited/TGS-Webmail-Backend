@@ -90,28 +90,30 @@ exports.submitContactForm = async (req, res) => {
     const {
       fullName,
       workEmail,
-      phoneNumber,
       company,
-      topics,
       message,
       attachmentLinks
     } = req.body;
 
-    const uploadedFiles = req.files?.map(file => file.path) || [];
-    const driveLinks = Array.isArray(attachmentLinks)
-      ? attachmentLinks.filter(link => isValidUrl(link))
-      : attachmentLinks && isValidUrl(attachmentLinks)
-        ? [attachmentLinks]
-        : [];
-    const attachments = [...uploadedFiles, ...driveLinks];
+const baseUrl = `${req.protocol}://${req.get("host")}`;
+
+const uploadedFiles =
+  req.files?.map((file) => `${baseUrl}/${file.path.replace(/\\/g, "/")}`) || [];
+
+const driveLinks = Array.isArray(attachmentLinks)
+  ? attachmentLinks.filter((link) => isValidUrl(link))
+  : attachmentLinks && isValidUrl(attachmentLinks)
+    ? [attachmentLinks]
+    : [];
+
+const attachments = [...uploadedFiles, ...driveLinks];
+
 
     // Save to DB ✅
     const contactEntry = new ContactQuery({
       fullName,
       workEmail,
-      phoneNumber,
       company,
-      topics: Array.isArray(topics) ? topics : [topics],
       message,
       attachments
     });
@@ -129,9 +131,7 @@ exports.submitContactForm = async (req, res) => {
       <h2>New Contact Query</h2>
       <p><strong>Name:</strong> ${fullName}</p>
       <p><strong>Email:</strong> ${workEmail}</p>
-      <p><strong>Phone:</strong> ${phoneNumber || 'N/A'}</p>
       <p><strong>Company:</strong> ${company || 'N/A'}</p>
-      <p><strong>Topics:</strong> ${(Array.isArray(topics) ? topics : [topics]).join(', ')}</p>
       <p><strong>Message:</strong><br>${message}</p>
       ${attachments.length > 0 ? `
         <p><strong>Attachments:</strong></p>

@@ -165,3 +165,42 @@ exports.assignRole = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to assign role' });
   }
 };
+
+//Update Password
+
+
+
+exports.updatePassword = async (req, res) => {
+  try {
+    const adminId = req.admin.id; // from decoded token payload
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "New passwords do not match." });
+    }
+
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found." });
+    }
+
+    const isMatch = await admin.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ message: "Current password is incorrect." });
+    }
+
+    admin.password = newPassword; 
+    await admin.save();
+
+    res.status(200).json({ message: "Password updated successfully." });
+  } catch (err) {
+    console.error("Error updating password:", err);
+    res.status(500).json({ message: "Server error." });
+  }
+};
