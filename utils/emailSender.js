@@ -20,6 +20,10 @@ const sendEmail = async ({ subject, html }) => {
       secure: port === 465,
       requireTLS: port === 587,
       auth: { user, pass },
+      connectionTimeout: 15000,
+      socketTimeout: 15000,
+      pool: false,
+      tls: { minVersion: 'TLSv1.2' },
       logger: true,
       debug: true,
     });
