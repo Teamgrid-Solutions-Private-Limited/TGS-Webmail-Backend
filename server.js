@@ -15,7 +15,7 @@ const adminRoutes = require('./routes/admin.routes');
 dotenv.config();
 
 const app = express();
-
+app.use(cors());
 app.set('trust proxy', 1);
 
 // Security Middlewares
@@ -31,7 +31,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // General Middlewares
-app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
