@@ -37,24 +37,17 @@ const sendEmail = async ({ subject, html }) => {
         // Minimum TLS version
         minVersion: 'TLSv1.2',
       },
-      // Connection timeout settings
-      connectionTimeout: 10000, // 10 seconds
-      greetingTimeout: 10000, // 10 seconds
-      socketTimeout: 10000, // 10 seconds
+      // Connection timeout settings - increased for production networks
+      connectionTimeout: 30000, // 30 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 30000, // 30 seconds
       // Retry configuration
       pool: false,
       maxConnections: 1,
       maxMessages: 3,
+      // Disable verification to avoid connection timeout issues
+      // Verification will happen during actual sendMail call
     });
-
-    // Verify connection before sending (optional but recommended)
-    try {
-      await transporter.verify();
-      console.log('✅ SMTP server is ready to send emails');
-    } catch (verifyError) {
-      console.error('❌ SMTP verification failed:', verifyError.message);
-      // Continue anyway - some servers don't support verification
-    }
 
     const mailOptions = {
       from: `"Contact Us" <${process.env.EMAIL_USER}>`,
@@ -68,6 +61,7 @@ const sendEmail = async ({ subject, html }) => {
       },
     };
 
+    // Send email directly (connection happens during sendMail)
     const info = await transporter.sendMail(mailOptions);
     console.log('✅ Email sent successfully:', info.messageId);
     return info;
