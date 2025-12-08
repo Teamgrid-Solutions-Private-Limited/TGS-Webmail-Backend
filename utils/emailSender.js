@@ -7,6 +7,9 @@ const createGmailTransport = () => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    connectionTimeout: 60000,
+    greetingTimeout: 30000,
+    socketTimeout: 60000,
   });
 };
 
@@ -65,25 +68,26 @@ const sendEmail = async ({ subject, html }) => {
   };
 
   try {
-    // Verify connection before sending
-    await transporter.verify();
-    
+    // Send email directly (connection happens during sendMail)
+    // Verification is skipped to avoid timeout issues - sendMail will connect anyway
     const info = await transporter.sendMail(message);
     console.log('✅ Email sent successfully:', info.messageId);
     return info;
   } catch (error) {
     console.error('❌ Error sending email:', error);
 
-    // In development, ignore certain errors if credentials are missing
+    // In development only, ignore certain errors if credentials are missing
     if (
       process.env.NODE_ENV === 'development' &&
-      (error.code === 'EAUTH' || error.code === 'ESOCKET' || error.code === 'ETIMEDOUT')
+      (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) &&
+      (error.code === 'EAUTH' || error.code === 'ESOCKET')
     ) {
-      console.warn('[DEV MODE] Ignoring email failure due to config/network issue.');
+      console.warn('[DEV MODE] Ignoring email failure due to missing credentials.');
       return;
     }
 
-    throw new Error('Email could not be sent');
+    // In production, always throw errors
+    throw new Error(`Email could not be sent: ${error.message}`);
   }
 };
 
