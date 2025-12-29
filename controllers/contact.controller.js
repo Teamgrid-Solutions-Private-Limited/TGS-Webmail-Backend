@@ -90,15 +90,14 @@ exports.submitContactForm = async (req, res) => {
 
     const { fullName, workEmail, company, message, attachmentLinks } = req.body;
 
-  const sanitize = (str = "") => String(str).replace(/[<>]/g, ""); // prevent HTML injection
+    const sanitize = (str = "") => String(str).replace(/[<>]/g, ""); // prevent HTML injection
 
-  const fromPage = sanitize(
-    req.query.fromPage || req.params.fromPage || "website"
-  );
-  const typeofQuery = sanitize(
-    req.query.typeofQuery || req.params.typeofQuery || "general inquiry"
-  );
-
+    const fromPage = sanitize(
+      req.query.fromPage || req.params.fromPage || "website"
+    );
+    const typeofQuery = sanitize(
+      req.query.typeofQuery || req.params.typeofQuery || "general inquiry"
+    );
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
 
@@ -154,7 +153,33 @@ exports.submitContactForm = async (req, res) => {
 
     setImmediate(async () => {
       try {
-        await sendEmail({ subject: emailSubject, html: emailHtml });
+        // Email to admin
+        await sendEmail({
+          subject: emailSubject,
+          html: emailHtml,
+          replyTo: workEmail,
+          to: process.env.EMAIL_TO,
+        });
+        console.log("✅ Email successfully sent to:", process.env.EMAIL_TO);
+
+        // Confirmation email to submitter
+        const confirmationSubject = `✅ We've received your message`;
+        const confirmationHtml = `
+          <h2>Thank you for contacting us, ${fullName}!</h2>
+          <p>We have received your message and will get back to you shortly.</p>
+          <hr>
+          <p><strong>Your Message Summary:</strong></p>
+          <p><strong>Company:</strong> ${company || "N/A"}</p>
+          <p><strong>Message:</strong><br>${message}</p>
+          <hr>
+          <p>Best regards,<br><strong>Teamgrid Solutions</strong></p>
+        `;
+        await sendEmail({
+          subject: confirmationSubject,
+          html: confirmationHtml,
+          to: workEmail,
+        });
+        console.log("✅ Confirmation email sent to submitter:", workEmail);
       } catch (err) {
         console.error("❌ Failed to send email:", err.message);
       }
