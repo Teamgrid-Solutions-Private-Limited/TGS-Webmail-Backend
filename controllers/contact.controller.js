@@ -88,16 +88,20 @@ exports.submitContactForm = async (req, res) => {
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
 
-    const { fullName, workEmail, company, message, attachmentLinks } = req.body;
+    const {
+      fullName,
+      workEmail,
+      company,
+      message,
+      attachmentLinks,
+      fromPage,
+      typeofQuery,
+    } = req.body;
 
     const sanitize = (str = "") => String(str).replace(/[<>]/g, ""); // prevent HTML injection
 
-    const fromPage = sanitize(
-      req.query.fromPage || req.params.fromPage || "website"
-    );
-    const typeofQuery = sanitize(
-      req.query.typeofQuery || req.params.typeofQuery || "general inquiry"
-    );
+    const sanitizedFromPage = sanitize(fromPage || "website");
+    const sanitizedTypeofQuery = sanitize(typeofQuery || "general inquiry");
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
 
@@ -120,8 +124,8 @@ exports.submitContactForm = async (req, res) => {
       company,
       message,
       attachments,
-      fromPage,
-      typeofQuery,
+      fromPage: sanitizedFromPage,
+      typeofQuery: sanitizedTypeofQuery,
     });
     await contactEntry.save();
 
