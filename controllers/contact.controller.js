@@ -88,16 +88,20 @@ exports.submitContactForm = async (req, res) => {
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
 
-    const { fullName, workEmail, company, message, attachmentLinks } = req.body;
+    const {
+      fullName,
+      workEmail,
+      company,
+      message,
+      attachmentLinks,
+      fromPage,
+      typeofQuery,
+    } = req.body;
 
     const sanitize = (str = "") => String(str).replace(/[<>]/g, ""); // prevent HTML injection
 
-    const fromPage = sanitize(
-      req.query.fromPage || req.params.fromPage || "website"
-    );
-    const typeofQuery = sanitize(
-      req.query.typeofQuery || req.params.typeofQuery || "general inquiry"
-    );
+    const sanitizedFromPage = sanitize(fromPage || "website");
+    const sanitizedTypeofQuery = sanitize(typeofQuery || "general inquiry");
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
 
@@ -120,8 +124,8 @@ exports.submitContactForm = async (req, res) => {
       company,
       message,
       attachments,
-      fromPage,
-      typeofQuery,
+      fromPage: sanitizedFromPage,
+      typeofQuery: sanitizedTypeofQuery,
     });
     await contactEntry.save();
 
@@ -132,7 +136,7 @@ exports.submitContactForm = async (req, res) => {
     });
 
     // Background Email send (non-blocking) ✅
-    const emailSubject = `Teamgrid Team`;
+    const emailSubject = `📨 New Contact Form Submission from ${fullName}`;
     const emailHtml = `
       <h2>${typeofQuery} from ${fromPage}</h2>
       <p><strong>Name:</strong> ${fullName}</p>
@@ -163,16 +167,34 @@ exports.submitContactForm = async (req, res) => {
         console.log("✅ Email successfully sent to:", process.env.EMAIL_TO);
 
         // Confirmation email to submitter
-        const confirmationSubject = `Teamgrid Team`;
+        const confirmationSubject =
+          "Thank you for contacting Teamgrid Solutions";
+
         const confirmationHtml = `
-          <h2>Thank you for contacting us, ${fullName}!</h2>
-          <p>We have received your message and will get back to you shortly.</p>
-          <hr>
-          <p><strong>Company:</strong> ${company || "N/A"}</p>
-          <p><strong>Message:</strong><br>${message}</p>
-          <hr>
-          <p>Best regards,<br><strong>Teamgrid Solutions</strong></p>
-        `;
+  <div style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #333; line-height: 1.6;">
+    <p>Dear ${fullName},</p>
+
+    <p>
+      We have received your message and our team will review it shortly.
+    </p>
+
+    <p>
+      If you need to add any additional information, you may reply to this email.
+    </p>
+
+    <p>
+      Best regards,<br>
+      <strong>Teamgrid Solutions</strong>
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #eee; margin-top: 24px;">
+
+    <p style="font-size: 12px; color: #777;">
+      This is an automated acknowledgment email. Please do not share sensitive or confidential information via email.
+    </p>
+  </div>
+`;
+
         await sendEmail({
           subject: confirmationSubject,
           html: confirmationHtml,
