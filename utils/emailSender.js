@@ -13,7 +13,7 @@ const sendEmail = async ({ subject, html, replyTo, to }) => {
   });
 
   const mailOptions = {
-    from: `"Contact Us" <${process.env.SMTP2GO_FROM_EMAIL}>`, // verified sender
+    from: `"TeamGrid Support" <${process.env.SMTP2GO_FROM_EMAIL}>`, // verified sender
     to: to || process.env.EMAIL_TO, // support inbox (default) or custom recipient
     replyTo, // user's email
     subject,
