@@ -132,9 +132,9 @@ exports.submitContactForm = async (req, res) => {
     });
 
     // Background Email send (non-blocking) ✅
-    const emailSubject = `📨 New Contact Form Submission from ${fullName}`;
+    const emailSubject = `Teamgrid Team`;
     const emailHtml = `
-      <h2>New Contact Query</h2>
+      <h2>${typeofQuery} from ${fromPage}</h2>
       <p><strong>Name:</strong> ${fullName}</p>
       <p><strong>Email:</strong> ${workEmail}</p>
       <p><strong>Company:</strong> ${company || "N/A"}</p>
@@ -163,12 +163,11 @@ exports.submitContactForm = async (req, res) => {
         console.log("✅ Email successfully sent to:", process.env.EMAIL_TO);
 
         // Confirmation email to submitter
-        const confirmationSubject = `✅ We've received your message`;
+        const confirmationSubject = `Teamgrid Team`;
         const confirmationHtml = `
           <h2>Thank you for contacting us, ${fullName}!</h2>
           <p>We have received your message and will get back to you shortly.</p>
           <hr>
-          <p><strong>Your Message Summary:</strong></p>
           <p><strong>Company:</strong> ${company || "N/A"}</p>
           <p><strong>Message:</strong><br>${message}</p>
           <hr>
