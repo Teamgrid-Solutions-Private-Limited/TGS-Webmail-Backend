@@ -5,6 +5,7 @@ const ContactQuerySchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   workEmail: { type: String, required: true },
   company: { type: String },
+  pricingType: { type: String },
   fromPage: { type: String },
   typeofQuery: { type: String },
   message: { type: String, required: true },

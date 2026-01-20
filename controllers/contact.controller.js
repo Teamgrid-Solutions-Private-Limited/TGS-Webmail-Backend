@@ -92,6 +92,7 @@ exports.submitContactForm = async (req, res) => {
       fullName,
       workEmail,
       company,
+      pricingType,
       message,
       attachmentLinks,
       fromPage,
@@ -122,6 +123,7 @@ exports.submitContactForm = async (req, res) => {
       fullName,
       workEmail,
       company,
+      pricingType,
       message,
       attachments,
       fromPage: sanitizedFromPage,
@@ -142,6 +144,7 @@ exports.submitContactForm = async (req, res) => {
       <p><strong>Name:</strong> ${fullName}</p>
       <p><strong>Email:</strong> ${workEmail}</p>
       <p><strong>Company:</strong> ${company || "N/A"}</p>
+      <p><strong>Pricing Type:</strong> ${pricingType || "N/A"}</p>
       <p><strong>Message:</strong><br>${message}</p>
       ${
         attachments.length > 0
@@ -161,7 +164,7 @@ exports.submitContactForm = async (req, res) => {
         await sendEmail({
           subject: emailSubject,
           html: emailHtml,
-          replyTo: workEmail,
+          //replyTo: workEmail,
           to: process.env.EMAIL_TO,
         });
         console.log("✅ Email successfully sent to:", process.env.EMAIL_TO);
@@ -195,12 +198,12 @@ exports.submitContactForm = async (req, res) => {
   </div>
 `;
 
-        await sendEmail({
-          subject: confirmationSubject,
-          html: confirmationHtml,
-          to: workEmail,
-        });
-        console.log("✅ Confirmation email sent to submitter:", workEmail);
+        // await sendEmail({
+        //   subject: confirmationSubject,
+        //   html: confirmationHtml,
+        //   //to: workEmail,
+        // });
+       // console.log("✅ Confirmation email sent to submitter:", workEmail);
       } catch (err) {
         console.error("❌ Failed to send email:", err.message);
       }
