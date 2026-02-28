@@ -97,6 +97,10 @@ exports.submitContactForm = async (req, res) => {
       attachmentLinks,
       fromPage,
       typeofQuery,
+      website,
+      timeline,
+      preferredEngagementType,
+      additionalNotes,
     } = req.body;
 
     const sanitize = (str = "") => String(str).replace(/[<>]/g, ""); // prevent HTML injection
@@ -128,6 +132,10 @@ exports.submitContactForm = async (req, res) => {
       attachments,
       fromPage: sanitizedFromPage,
       typeofQuery: sanitizedTypeofQuery,
+      website,
+      timeline,
+      preferredEngagementType,
+      additionalNotes,
     });
     await contactEntry.save();
 
@@ -145,6 +153,10 @@ exports.submitContactForm = async (req, res) => {
       <p><strong>Email:</strong> ${workEmail}</p>
       <p><strong>Company:</strong> ${company || "N/A"}</p>
       <p><strong>Pricing Type:</strong> ${pricingType || "N/A"}</p>
+      ${website ? `<p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>` : ''}
+      ${timeline ? `<p><strong>Timeline:</strong> ${timeline}</p>` : ''}
+      ${preferredEngagementType ? `<p><strong>Preferred Engagement Type:</strong> ${preferredEngagementType}</p>` : ''}
+      ${additionalNotes ? `<p><strong>Additional Notes:</strong><br>${additionalNotes}</p>` : ''}
       <p><strong>Message:</strong><br>${message}</p>
       ${
         attachments.length > 0
