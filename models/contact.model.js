@@ -10,7 +10,13 @@ const ContactQuerySchema = new mongoose.Schema({
   typeofQuery: { type: String },
   message: { type: String, required: true },
   attachments: [{ type: String }], // URLs or file paths
-  createdAt: { type: Date, default: Date.now }
+  website: {type: String},
+  timeline: {type: String},
+  preferredEngagementType: {type: String},
+  additionalNotes: {type: String},
+  
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model("contactqueries", ContactQuerySchema);
