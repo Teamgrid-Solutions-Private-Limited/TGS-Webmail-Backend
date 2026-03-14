@@ -11,6 +11,7 @@ const ContactQuerySchema = new mongoose.Schema({
   message: { type: String, required: true },
   attachments: [{ type: String }], // URLs or file paths
   website: {type: String},
+  phoneNumber: {type: String},
   timeline: {type: String},
   preferredEngagementType: {type: String},
   additionalNotes: {type: String},

@@ -11,76 +11,7 @@ const isValidUrl = (url) => {
   }
 };
 
-// exports.submitContactForm = async (req, res) => {
-//   try {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-//     const {
-//       fullName,
-//       workEmail,
-//       phoneNumber,
-//       company,
-//       topics,
-//       message,
-//       attachmentLinks // May be single or multiple
-//     } = req.body;
-
-//     // Process uploaded files
-//     const uploadedFiles = req.files?.map(file => file.path) || [];
-
-//     // Process shared links
-//     const driveLinks = Array.isArray(attachmentLinks)
-//       ? attachmentLinks.filter(link => isValidUrl(link))
-//       : attachmentLinks && isValidUrl(attachmentLinks)
-//         ? [attachmentLinks]
-//         : [];
-
-//     const attachments = [...uploadedFiles, ...driveLinks];
-
-//     // Save to DB
-//     const contactEntry = new ContactQuery({
-//       fullName,
-//       workEmail,
-//       phoneNumber,
-//       company,
-//       topics: Array.isArray(topics) ? topics : [topics],
-//       message,
-//       attachments
-//     });
-
-//     await contactEntry.save();
-
-//     // ✉️ Send Email
-//     const emailSubject = `📨 New Contact Form Submission from ${fullName}`;
-//     const emailHtml = `
-//       <h2>New Contact Query</h2>
-//       <p><strong>Name:</strong> ${fullName}</p>
-//       <p><strong>Email:</strong> ${workEmail}</p>
-//       <p><strong>Phone:</strong> ${phoneNumber || 'N/A'}</p>
-//       <p><strong>Company:</strong> ${company || 'N/A'}</p>
-//       <p><strong>Topics:</strong> ${(Array.isArray(topics) ? topics : [topics]).join(', ')}</p>
-//       <p><strong>Message:</strong><br>${message}</p>
-//       ${attachments.length > 0 ? `
-//         <p><strong>Attachments:</strong></p>
-//         <ul>
-//           ${attachments.map(link => `<li><a href="${link}" target="_blank">${link}</a></li>`).join('')}
-//         </ul>
-//       ` : ''}
-//     `;
-
-//     await sendEmail({ subject: emailSubject, html: emailHtml });
-
-//     return res.status(201).json({
-//       success: true,
-//       message: 'Your query has been received!'
-//     });
-
-//   } catch (error) {
-//     console.error('Error saving contact form:', error);
-//     return res.status(500).json({ success: false, message: 'Server Error' });
-//   }
-// };
 
 exports.submitContactForm = async (req, res) => {
   try {
@@ -98,6 +29,7 @@ exports.submitContactForm = async (req, res) => {
       fromPage,
       typeofQuery,
       website,
+      phoneNumber,
       timeline,
       preferredEngagementType,
       additionalNotes,
@@ -133,6 +65,7 @@ exports.submitContactForm = async (req, res) => {
       fromPage: sanitizedFromPage,
       typeofQuery: sanitizedTypeofQuery,
       website,
+      phoneNumber,
       timeline,
       preferredEngagementType,
       additionalNotes,
@@ -151,6 +84,7 @@ exports.submitContactForm = async (req, res) => {
       <h2>${typeofQuery} from ${fromPage}</h2>
       <p><strong>Name:</strong> ${fullName}</p>
       <p><strong>Email:</strong> ${workEmail}</p>
+      <p><strong>Phone:</strong> ${phoneNumber || "N/A"}</p>
       <p><strong>Company:</strong> ${company || "N/A"}</p>
       <p><strong>Pricing Type:</strong> ${pricingType || "N/A"}</p>
       ${website ? `<p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>` : ''}
@@ -158,15 +92,14 @@ exports.submitContactForm = async (req, res) => {
       ${preferredEngagementType ? `<p><strong>Preferred Engagement Type:</strong> ${preferredEngagementType}</p>` : ''}
       ${additionalNotes ? `<p><strong>Additional Notes:</strong><br>${additionalNotes}</p>` : ''}
       <p><strong>Message:</strong><br>${message}</p>
-      ${
-        attachments.length > 0
-          ? `
+      ${attachments.length > 0
+        ? `
         <p><strong>Attachments:</strong></p>
         <ul>
           ${attachments.map((link) => `<li><a href="${link}" target="_blank">${link}</a></li>`).join("")}
         </ul>
       `
-          : ""
+        : ""
       }
     `;
 
@@ -215,7 +148,7 @@ exports.submitContactForm = async (req, res) => {
         //   html: confirmationHtml,
         //   //to: workEmail,
         // });
-       // console.log("✅ Confirmation email sent to submitter:", workEmail);
+        // console.log("✅ Confirmation email sent to submitter:", workEmail);
       } catch (err) {
         console.error("❌ Failed to send email:", err.message);
       }
