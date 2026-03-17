@@ -11,8 +11,6 @@ const isValidUrl = (url) => {
   }
 };
 
-
-
 exports.submitContactForm = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -23,16 +21,17 @@ exports.submitContactForm = async (req, res) => {
       fullName,
       workEmail,
       company,
-      pricingType,
+      // pricingType,
       message,
       attachmentLinks,
       fromPage,
       typeofQuery,
-      website,
+      // website,
       phoneNumber,
-      timeline,
-      preferredEngagementType,
-      additionalNotes,
+      country,
+      // timeline,
+      // preferredEngagementType,
+      // additionalNotes,
     } = req.body;
 
     const sanitize = (str = "") => String(str).replace(/[<>]/g, ""); // prevent HTML injection
@@ -59,16 +58,17 @@ exports.submitContactForm = async (req, res) => {
       fullName,
       workEmail,
       company,
-      pricingType,
+      // pricingType,
       message,
       attachments,
       fromPage: sanitizedFromPage,
       typeofQuery: sanitizedTypeofQuery,
-      website,
+      // website,
       phoneNumber,
-      timeline,
-      preferredEngagementType,
-      additionalNotes,
+      country,
+      // timeline,
+      // preferredEngagementType,
+      // additionalNotes,
     });
     await contactEntry.save();
 
@@ -84,13 +84,9 @@ exports.submitContactForm = async (req, res) => {
       <h2>${typeofQuery} from ${fromPage}</h2>
       <p><strong>Name:</strong> ${fullName}</p>
       <p><strong>Email:</strong> ${workEmail}</p>
+      <p><strong>Country Code:</strong> ${country || "N/A"}</p>
       <p><strong>Phone:</strong> ${phoneNumber || "N/A"}</p>
       <p><strong>Company:</strong> ${company || "N/A"}</p>
-      <p><strong>Pricing Type:</strong> ${pricingType || "N/A"}</p>
-      ${website ? `<p><strong>Website:</strong> <a href="${website}" target="_blank">${website}</a></p>` : ''}
-      ${timeline ? `<p><strong>Timeline:</strong> ${timeline}</p>` : ''}
-      ${preferredEngagementType ? `<p><strong>Preferred Engagement Type:</strong> ${preferredEngagementType}</p>` : ''}
-      ${additionalNotes ? `<p><strong>Additional Notes:</strong><br>${additionalNotes}</p>` : ''}
       <p><strong>Message:</strong><br>${message}</p>
       ${attachments.length > 0
         ? `

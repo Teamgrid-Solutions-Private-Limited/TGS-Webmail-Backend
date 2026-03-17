@@ -8,7 +8,7 @@ exports.exportContacts = async (req, res) => {
     const format = req.query.format || 'json';
 
     if (format === 'csv') {
-      const fields = ['fullName', 'workEmail', 'phoneNumber', 'company', 'topics', 'message', 'createdAt'];
+      const fields = ['fullName', 'workEmail', 'country', 'phoneNumber', 'company', 'topics', 'message', 'createdAt'];
       const parser = new Parser({ fields });
       const csv = parser.parse(contacts);
 

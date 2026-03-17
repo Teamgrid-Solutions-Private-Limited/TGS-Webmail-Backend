@@ -8,70 +8,70 @@ const ExcelJS = require('exceljs');
 
 // 🔐 Register Admin
 exports.registerAdmin = async (req, res) => {
-    try {
-      const { email, password, role } = req.body;
-  
-      // Check if admin already exists
-      const existingAdmin = await Admin.findOne({ email });
-      if (existingAdmin) {
-        return res.status(400).json({ success: false, message: 'Email already registered' });
-      }
-  
-      // Create and save new admin (password is auto-hashed in model)
-      const newAdmin = new Admin({ email, password, role });
-      await newAdmin.save();
-  
-      res.status(201).json({
-        success: true,
-        message: 'Admin registered successfully',
-        data: {
-          id: newAdmin._id,
-          email: newAdmin.email,
-          role: newAdmin.role
-        }
-      });
-    } catch (err) {
-      console.error('Admin register error:', err);
-      res.status(500).json({ success: false, message: 'Server Error' });
+  try {
+    const { email, password, role } = req.body;
+
+    // Check if admin already exists
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      return res.status(400).json({ success: false, message: 'Email already registered' });
     }
-  };
-  
-  // 🔐 Login Admin
-  exports.loginAdmin = async (req, res) => {
-    try {
-      const { email, password } = req.body;
-  
-      const admin = await Admin.findOne({ email });
-      if (!admin) {
-        return res.status(401).json({ success: false, message: 'Invalid email or password' });
+
+    // Create and save new admin (password is auto-hashed in model)
+    const newAdmin = new Admin({ email, password, role });
+    await newAdmin.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Admin registered successfully',
+      data: {
+        id: newAdmin._id,
+        email: newAdmin.email,
+        role: newAdmin.role
       }
-  
-      const isMatch = await admin.comparePassword(password);
-      if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid email or password' });
-      }
-  
-      const token = jwt.sign(
-        { id: admin._id, role: admin.role },
-        process.env.JWT_SECRET,
-        { expiresIn: '1d' }
-      );
-  
-      res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        token,
-        data: {
-          id: admin._id,
-          email: admin.email,
-          role: admin.role
-        }
-      });
-    } catch (err) {
-      console.error('Admin login error:', err);
-      res.status(500).json({ success: false, message: 'Server Error' });
+    });
+  } catch (err) {
+    console.error('Admin register error:', err);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+// 🔐 Login Admin
+exports.loginAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
-  };
+
+    const isMatch = await admin.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    }
+
+    const token = jwt.sign(
+      { id: admin._id, role: admin.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      token,
+      data: {
+        id: admin._id,
+        email: admin.email,
+        role: admin.role
+      }
+    });
+  } catch (err) {
+    console.error('Admin login error:', err);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
 
 // 📋 Get All Contact Queries
 exports.getAllContactQueries = async (req, res) => {
@@ -91,6 +91,7 @@ exports.exportContactsCSV = async (req, res) => {
     const fields = [
       { label: 'Full Name', value: 'fullName' },
       { label: 'Email', value: 'workEmail' },
+      { label: 'Country', value: 'country' },
       { label: 'Phone', value: 'phoneNumber' },
       { label: 'Company', value: 'company' },
       { label: 'Topics', value: row => row.topics?.join(', ') },
@@ -120,6 +121,7 @@ exports.exportContactsExcel = async (req, res) => {
     worksheet.columns = [
       { header: 'Full Name', key: 'fullName' },
       { header: 'Email', key: 'workEmail' },
+      { header: 'Country', key: 'country' },
       { header: 'Phone', key: 'phoneNumber' },
       { header: 'Company', key: 'company' },
       { header: 'Topics', key: 'topics' },
@@ -195,7 +197,7 @@ exports.updatePassword = async (req, res) => {
         .json({ message: "Current password is incorrect." });
     }
 
-    admin.password = newPassword; 
+    admin.password = newPassword;
     await admin.save();
 
     res.status(200).json({ message: "Password updated successfully." });
